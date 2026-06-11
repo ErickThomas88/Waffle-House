@@ -237,30 +237,30 @@
     box.innerHTML = html;
   }
 
-  // ---------------- call-out (pull / drop / mark) ----------------
+  // ---------------- official ticket grid + Pull/Drop/Mark call ----------------
   function renderCallout() {
-    const pulls = [], drops = [], marks = [];
-    state.lines.forEach(l => {
-      const q = l.qty > 1 ? l.qty + " " : "";
-      const cat = (MENU.items.find(i => i.id === l.itemId) || {}).cat;
-      if (l._meatSide || cat === "Side Meats") pulls.push(`${l.qty}× ${l.name.replace(/\s*\(.*\)/, "")}`);
-      if (cat === "Burgers") pulls.push(`${l.qty}× quarter patty${l.name.toLowerCase().includes("double") ? " (double)" : ""}`);
-      if (cat === "Dinners") pulls.push(`${l.qty}× ${l.name.replace(/ dinner.*/i, "")}`);
-      (l.notes || []).forEach(n => {
-        if (["bacon", "sausage", "chicken sausage", "city ham", "country ham"].includes(n)) pulls.push(`${l.qty}× ${n}`);
-        if (n === "hashbrowns") drops.push(l.qty);
-      });
-      if (/^hb-/.test(l.itemId)) drops.push(l.qty);
-      if (/hashbrown bowl/i.test(l.name)) drops.push(l.qty);
-      marks.push(`${q}${l.name}${l.notes && l.notes.length ? " — " + l.notes.join(", ") : ""}` +
-        (l.mods && l.mods.length ? " — " + l.mods.map(m => m.name).join(", ") : ""));
+    const grid = WHTicket.buildGrid(state.lines, MENU);
+    const tbl = $("#wtGrid");
+    if (!state.lines.length) {
+      tbl.innerHTML = "";
+      $("#callout").textContent = "(nothing yet)";
+      return;
+    }
+    const seats = grid.seats.length ? grid.seats : [1];
+    let html = "<tr><th></th>" +
+      seats.map(s => `<th>${"①②③④⑤⑥⑦⑧"[s - 1] || s}</th>`).join("") +
+      "<th class='amt'>AMOUNT</th></tr>";
+    grid.rows.forEach(r => {
+      const has = Object.keys(r.cells).length;
+      html += `<tr class="${has ? "" : "blank"}"><td class="rn">${r.name}</td>` +
+        seats.map(s => `<td>${(r.cells[s] || []).join("<br>")}</td>`).join("") +
+        `<td class="amt">${r.amount ? r.amount.toFixed(2) : ""}</td></tr>`;
     });
-    const dropCount = drops.reduce((a, b) => a + b, 0);
-    let out = "";
-    if (pulls.length) out += "PULL:  " + pulls.join(", ") + "\n";
-    if (dropCount) out += "DROP:  " + dropCount + " hashbrown" + (dropCount > 1 ? "s" : "") + "\n";
-    if (marks.length) out += "MARK:  " + marks.join("\n       ");
-    $("#callout").textContent = out || "(nothing yet)";
+    html += `<tr class="tot"><td class="rn">TOTAL</td>` +
+      seats.map(() => "<td></td>").join("") +
+      `<td class="amt">${grid.total.toFixed(2)}</td></tr>`;
+    tbl.innerHTML = html;
+    $("#callout").textContent = WHTicket.buildCall(state.lines, MENU, state.orderType);
   }
 
   // ---------------- ticket actions ----------------

@@ -25,7 +25,13 @@ priced ticket. Built for personal use — not affiliated with Waffle House, Inc.
   seat, or remove it; add items via the search box if parsing missed one.
 - ⚠️ **Edge cases** — e.g. "All-Star, no eggs" triggers a warning that it's
   really just a waffle + sides.
-- 📢 **Kitchen call-out** — a simple Pull / Drop / Mark cheat line.
+- 📢 **Write it & call it** — renders the order on the official 2026
+  "ORDER BEFORE DRINKS!" guest-check grid (one column per customer, packet
+  abbreviations, amount per row, total) and generates the exact Three-Part
+  Call-In: **PULL** the meats first, **DROP** the hashbrowns
+  (scattered / in the ring / light / well / steamed), then **MARK** the
+  order top-to-bottom — longest-cooking food first — with the
+  **ON / MAKE / LIKE / HOLD / TO-GO** call terms from the training packet.
 
 ## Updating prices when Waffle House changes them
 
@@ -58,6 +64,7 @@ No build step — plain HTML/CSS/JS.
 ```bash
 python3 -m http.server          # then open http://localhost:8000
 node tests/parser.test.mjs      # parser smoke tests
+node tests/ticket.test.mjs      # ticket writing + call tests
 ```
 
 Files:
@@ -67,9 +74,30 @@ Files:
 | `index.html` | App shell (Order + Prices tabs) |
 | `data/prices.js` | The price sheet — **edit this when prices change** |
 | `js/parser.js` | Free-text → ticket lines |
+| `js/ticket.js` | Official ticket abbreviations + Pull/Drop/Mark call |
 | `js/speech.js` | Web Speech API mic input |
 | `js/app.js` | UI, totals, price editor |
 | `tests/parser.test.mjs` | Parser smoke tests |
+| `tests/ticket.test.mjs` | Ticket grid + call-in tests |
+
+### Ticket-writing cheat sheet (from the training packet)
+
+- **Rows on the 2026 check:** HASHBROWNS (the *drop*), BOWLS, DINNER MEATS,
+  SANDWICHES, OMELETS, EGGS, WAFFLES, HAM BACON SAUSAGE, OTHER, BEVERAGES.
+  The PULL line across the top tallies meats: K T D P CH CS Q S SS B Kp H.
+- **Hashbrowns:** `√` in the ring · `√s` scattered · add `l/w/m` for
+  light/well/steamed · then one lower-case letter per topping in
+  s-c-h-d-p-a-t-g order (smothered onions, covered cheese, chunked ham,
+  diced tomatoes, peppered, capped mushrooms, topped chili, country gravy).
+- **Eggs:** UP, OL, OM, OW, SCR, SCRL, SCRW, SCRC — egg meals come with
+  grits & white toast automatically; only write toast/grits if different
+  (`w` wheat, `r` raisin, `Tx` Texas — white toast gets no abbreviation).
+- **Hold = ⊘** around the abbreviation · **on-the-side = circle it** ·
+  to-go = "TO-GO" with a line through the check.
+- **The call:** stand on the mark → `PULL` meats (count + meat) → `DROP`
+  hashbrowns (count + scattered/in-the-ring + light/well/steamed) → `MARK`
+  the full order, top to bottom, longest-cooking first; `ON n` for
+  duplicates, `MAKE n` for variations, `LIKE n` for same plate.
 
 ## Price-sheet notes
 
