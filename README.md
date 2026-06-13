@@ -5,6 +5,13 @@ priced ticket. Built for personal use — not affiliated with Waffle House, Inc.
 
 **Live site (once set up):** `https://erickthomas88.github.io/Waffle-House/`
 
+**Single-file build:** [`waffle-house.html`](waffle-house.html) is the whole app
+in one self-contained file (CSS + JS inlined, no external references). Use it to
+**prototype as a Claude artifact on your phone**: open `waffle-house.html`, copy
+all of it, paste into the Claude app, and ask Claude to "run this as an HTML
+artifact." It also works by itself — open the file in any browser, online or off.
+Regenerate it after editing the source with `node tools/build-artifact.mjs`.
+
 ## What it does
 
 - 🎤 **Voice or typing** — tap the mic and say the order, or type it.
@@ -65,6 +72,7 @@ No build step — plain HTML/CSS/JS.
 python3 -m http.server          # then open http://localhost:8000
 node tests/parser.test.mjs      # parser smoke tests
 node tests/ticket.test.mjs      # ticket writing + call tests
+node tools/build-artifact.mjs   # regenerate the single-file waffle-house.html
 ```
 
 Files:
@@ -77,8 +85,15 @@ Files:
 | `js/ticket.js` | Official ticket abbreviations + Pull/Drop/Mark call |
 | `js/speech.js` | Web Speech API mic input |
 | `js/app.js` | UI, totals, price editor |
+| `tools/build-artifact.mjs` | Bundles everything into `waffle-house.html` |
+| `waffle-house.html` | **Generated** single-file build (artifact-ready) |
 | `tests/parser.test.mjs` | Parser smoke tests |
 | `tests/ticket.test.mjs` | Ticket grid + call-in tests |
+
+> The single-file build installs an in-memory `localStorage` fallback so it
+> still runs inside a sandboxed artifact iframe (where browser storage can be
+> blocked). In the sandbox the mic and saved tickets may be unavailable, but
+> typing orders, pricing, the guest-check grid, and the call all work.
 
 ### Ticket-writing cheat sheet (from the training packet)
 
